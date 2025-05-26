@@ -1,0 +1,103 @@
+{
+  "name": "copilot-custom-rules",
+  "displayName": "Copilot Custom Rules",
+  "description": "Auto-inject custom rules for GitHub Copilot with editable UI sidebar",
+  "version": "1.0.0",
+  "publisher": "naufaljct48",
+  "engines": {
+    "vscode": "^1.74.0"
+  },
+  "categories": [
+    "Other",
+    "Machine Learning"
+  ],
+  "keywords": [
+    "copilot",
+    "github",
+    "ai",
+    "rules",
+    "instructions",
+    "custom"
+  ],
+  "icon": "icon.png",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/naufaljct48/copilot-custom-rules.git"
+  },
+  "bugs": {
+    "url": "https://github.com/naufaljct48/copilot-custom-rules/issues"
+  },
+  "homepage": "https://github.com/naufaljct48/copilot-custom-rules#readme",
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "copilot-custom-rules.openRulesEditor",
+        "title": "Open Rules Editor",
+        "category": "Copilot Custom Rules"
+      },
+      {
+        "command": "copilot-custom-rules.injectRules",
+        "title": "Inject Custom Rules",
+        "category": "Copilot Custom Rules"
+      },
+      {
+        "command": "copilot-custom-rules.resetToDefault",
+        "title": "Reset to Default Rules",
+        "category": "Copilot Custom Rules"
+      }
+    ],
+    "views": {
+      "explorer": [
+        {
+          "id": "copilot-custom-rules",
+          "name": "Copilot Custom Rules",
+          "when": "workspaceHasFolder"
+        }
+      ]
+    },
+    "viewsWelcome": [
+      {
+        "view": "copilot-custom-rules",
+        "contents": "Welcome to Copilot Custom Rules!\n\n[Open Rules Editor](command:copilot-custom-rules.openRulesEditor)\n[Inject Rules Now](command:copilot-custom-rules.injectRules)\n[Reset to Default](command:copilot-custom-rules.resetToDefault)"
+      }
+    ],
+    "configuration": {
+      "title": "Copilot Custom Rules",
+      "properties": {
+        "copilot-custom-rules.autoInject": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically inject custom rules when VS Code starts"
+        },
+        "copilot-custom-rules.updateGitignore": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically update .gitignore to exclude instructions files"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js",
+    "package": "vsce package"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.74.0",
+    "@types/node": "16.x",
+    "@typescript-eslint/eslint-plugin": "^5.45.0",
+    "@typescript-eslint/parser": "^5.45.0",
+    "eslint": "^8.28.0",
+    "typescript": "^4.9.4",
+    "@vscode/test-electron": "^2.2.0",
+    "vsce": "^2.15.0"
+  }
+}
