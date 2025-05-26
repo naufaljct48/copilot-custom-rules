@@ -1,0 +1,72 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        
+    - name: Install dependencies
+      run: npm install
+      
+    - name: Compile TypeScript
+      run: npm run compile
+      
+    - name: Package extension
+      run: npm run package
+      
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
+        body: |
+          ## Copilot Custom Rules v${{ github.ref_name }}
+          
+          ### Features
+          - 🚀 Auto-injection of custom rules on VS Code startup
+          - 📝 Visual rules editor in sidebar
+          - 🔄 Smart updates of existing instruction files
+          - 📁 GitHub Copilot integration with `.github/instructions/` folder
+          - 🙈 Automatic `.gitignore` management
+          
+          ### Installation
+          1. Download the `.vsix` file from this release
+          2. Open VS Code
+          3. Go to Extensions (Ctrl+Shift+X)
+          4. Click "..." menu and select "Install from VSIX..."
+          5. Select the downloaded `.vsix` file
+          
+          ### Usage
+          - Extension activates automatically when you open a workspace
+          - Custom rules are injected immediately on startup
+          - Use the sidebar panel to edit your custom rules
+          
+          See [README.md](https://github.com/naufaljct48/copilot-custom-rules/blob/main/README.md) for detailed documentation.
+        draft: false
+        prerelease: false
+        
+    - name: Upload VSIX file
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./copilot-custom-rules-*.vsix
+        asset_name: copilot-custom-rules-${{ github.ref_name }}.vsix
+        asset_content_type: application/zip
