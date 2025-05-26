@@ -1,70 +1,70 @@
-import * as vscode from 'vscode';
-import { FileManager } from './fileManager';
+import * as vscode from "vscode";
+import { FileManager } from "./fileManager";
 
 export class RulesEditorProvider implements vscode.WebviewViewProvider {
-    public static readonly viewType = 'copilot-custom-rules';
-    private _view?: vscode.WebviewView;
-    private fileManager: FileManager;
+  public static readonly viewType = "copilot-custom-rules-view";
+  private _view?: vscode.WebviewView;
+  private fileManager: FileManager;
 
-    constructor(
-        private readonly _extensionUri: vscode.Uri,
-        fileManager: FileManager
-    ) {
-        this.fileManager = fileManager;
-    }
+  constructor(
+    private readonly _extensionUri: vscode.Uri,
+    fileManager: FileManager
+  ) {
+    this.fileManager = fileManager;
+  }
 
-    public resolveWebviewView(
-        webviewView: vscode.WebviewView,
-        context: vscode.WebviewViewResolveContext,
-        _token: vscode.CancellationToken,
-    ) {
-        this._view = webviewView;
+  public resolveWebviewView(
+    webviewView: vscode.WebviewView,
+    context: vscode.WebviewViewResolveContext,
+    _token: vscode.CancellationToken
+  ) {
+    this._view = webviewView;
 
-        webviewView.webview.options = {
-            enableScripts: true,
-            localResourceRoots: [
-                this._extensionUri
-            ]
-        };
+    webviewView.webview.options = {
+      enableScripts: true,
+      localResourceRoots: [this._extensionUri],
+    };
 
-        webviewView.webview.html = this._getHtmlForWebview(webviewView.webview);
+    webviewView.webview.html = this._getHtmlForWebview(webviewView.webview);
 
-        webviewView.webview.onDidReceiveMessage(async (data) => {
-            switch (data.type) {
-                case 'loadRules':
-                    const rules = await this.fileManager.getCustomRules();
-                    webviewView.webview.postMessage({
-                        type: 'rulesLoaded',
-                        content: rules
-                    });
-                    break;
-                case 'saveRules':
-                    try {
-                        await this.fileManager.saveCustomRules(data.content);
-                        await this.fileManager.injectRules();
-                        vscode.window.showInformationMessage('Rules saved and injected successfully!');
-                    } catch (error) {
-                        vscode.window.showErrorMessage(`Failed to save rules: ${error}`);
-                    }
-                    break;
-                case 'resetRules':
-                    try {
-                        await this.fileManager.resetToDefault();
-                        const defaultRules = await this.fileManager.getCustomRules();
-                        webviewView.webview.postMessage({
-                            type: 'rulesLoaded',
-                            content: defaultRules
-                        });
-                    } catch (error) {
-                        vscode.window.showErrorMessage(`Failed to reset rules: ${error}`);
-                    }
-                    break;
-            }
-        });
-    }
+    webviewView.webview.onDidReceiveMessage(async (data) => {
+      switch (data.type) {
+        case "loadRules":
+          const rules = await this.fileManager.getCustomRules();
+          webviewView.webview.postMessage({
+            type: "rulesLoaded",
+            content: rules,
+          });
+          break;
+        case "saveRules":
+          try {
+            await this.fileManager.saveCustomRules(data.content);
+            await this.fileManager.injectRules();
+            vscode.window.showInformationMessage(
+              "Rules saved and injected successfully!"
+            );
+          } catch (error) {
+            vscode.window.showErrorMessage(`Failed to save rules: ${error}`);
+          }
+          break;
+        case "resetRules":
+          try {
+            await this.fileManager.resetToDefault();
+            const defaultRules = await this.fileManager.getCustomRules();
+            webviewView.webview.postMessage({
+              type: "rulesLoaded",
+              content: defaultRules,
+            });
+          } catch (error) {
+            vscode.window.showErrorMessage(`Failed to reset rules: ${error}`);
+          }
+          break;
+      }
+    });
+  }
 
-    private _getHtmlForWebview(webview: vscode.Webview) {
-        return `<!DOCTYPE html>
+  private _getHtmlForWebview(webview: vscode.Webview) {
+    return `<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -79,29 +79,29 @@ export class RulesEditorProvider implements vscode.WebviewViewProvider {
             margin: 0;
             padding: 10px;
         }
-        
+
         .container {
             display: flex;
             flex-direction: column;
             height: 100vh;
         }
-        
+
         .header {
             margin-bottom: 10px;
         }
-        
+
         .title {
             font-size: 16px;
             font-weight: bold;
             margin-bottom: 10px;
         }
-        
+
         .buttons {
             display: flex;
             gap: 5px;
             margin-bottom: 10px;
         }
-        
+
         button {
             background-color: var(--vscode-button-background);
             color: var(--vscode-button-foreground);
@@ -111,20 +111,20 @@ export class RulesEditorProvider implements vscode.WebviewViewProvider {
             cursor: pointer;
             font-size: 12px;
         }
-        
+
         button:hover {
             background-color: var(--vscode-button-hoverBackground);
         }
-        
+
         .secondary {
             background-color: var(--vscode-button-secondaryBackground);
             color: var(--vscode-button-secondaryForeground);
         }
-        
+
         .secondary:hover {
             background-color: var(--vscode-button-secondaryHoverBackground);
         }
-        
+
         textarea {
             flex: 1;
             width: 100%;
@@ -137,11 +137,11 @@ export class RulesEditorProvider implements vscode.WebviewViewProvider {
             resize: none;
             outline: none;
         }
-        
+
         textarea:focus {
             border-color: var(--vscode-focusBorder);
         }
-        
+
         .status {
             margin-top: 10px;
             font-size: 12px;
@@ -174,9 +174,9 @@ export class RulesEditorProvider implements vscode.WebviewViewProvider {
 
         saveBtn.addEventListener('click', () => {
             const content = editor.value;
-            vscode.postMessage({ 
-                type: 'saveRules', 
-                content: content 
+            vscode.postMessage({
+                type: 'saveRules',
+                content: content
             });
             status.textContent = 'Saving...';
         });
@@ -207,5 +207,5 @@ export class RulesEditorProvider implements vscode.WebviewViewProvider {
     </script>
 </body>
 </html>`;
-    }
+  }
 }

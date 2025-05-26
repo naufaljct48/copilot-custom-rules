@@ -2,9 +2,26 @@
 
 All notable changes to the "Copilot Custom Rules" extension will be documented in this file.
 
+## [1.0.1] - 2024-12-19
+
+### Fixed
+
+- 🔧 Fixed WebView Editor not appearing in sidebar
+- 📋 Replaced WebView with TreeView for better compatibility
+- ✨ Added direct "Edit Custom Rules" command that opens rules file in editor
+- ⚙️ Added "Open Settings" command for easy access to extension settings
+- 🎯 Improved sidebar UI with clear action buttons
+
+### Changed
+
+- 📝 TreeView now shows 4 main actions: Edit Rules, Inject Rules, Reset to Default, Settings
+- 🔄 "Edit Custom Rules" now opens the actual file in VS Code editor instead of WebView
+- 📁 Better file handling for custom rules creation and editing
+
 ## [1.0.0] - 2024-12-19
 
 ### Added
+
 - 🎉 Initial release of Copilot Custom Rules extension
 - ⚡ Auto-injection of custom rules on VS Code startup using `onStartupFinished` activation event
 - 📝 Visual rules editor in sidebar with WebView interface
@@ -28,6 +45,7 @@ All notable changes to the "Copilot Custom Rules" extension will be documented i
 - 💾 Persistent storage of custom rules in `.vscode/copilot-custom-rules.md`
 
 ### Features
+
 - **Auto-Injection**: Automatically injects rules when opening any workspace
 - **Visual Editor**: User-friendly textarea interface with save/reset functionality
 - **Smart Updates**: Preserves custom edits and updates existing instruction files
@@ -38,6 +56,7 @@ All notable changes to the "Copilot Custom Rules" extension will be documented i
 - **Session Continuity**: Rules for maintaining context across coding sessions
 
 ### Technical Details
+
 - Built with TypeScript and VS Code Extension API
 - Uses `onStartupFinished` activation event for optimal performance
 - Implements WebView for rich UI experience
@@ -46,6 +65,7 @@ All notable changes to the "Copilot Custom Rules" extension will be documented i
 - Follows VS Code extension best practices
 
 ### File Structure
+
 ```
 ├── src/
 │   ├── extension.ts          # Main extension logic
@@ -60,9 +80,11 @@ All notable changes to the "Copilot Custom Rules" extension will be documented i
 ```
 
 ### Known Issues
+
 - None reported in initial release
 
 ### Upcoming Features
+
 - Export/import rules functionality
 - Multiple rule templates
 - Team sharing capabilities

@@ -2,7 +2,7 @@
   "name": "copilot-custom-rules",
   "displayName": "Copilot Custom Rules",
   "description": "Auto-inject custom rules for GitHub Copilot with editable UI sidebar",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "publisher": "naufaljct48",
   "engines": {
     "vscode": "^1.74.0"
@@ -48,12 +48,22 @@
         "command": "copilot-custom-rules.resetToDefault",
         "title": "Reset to Default Rules",
         "category": "Copilot Custom Rules"
+      },
+      {
+        "command": "copilot-custom-rules.edit",
+        "title": "Edit Custom Rules",
+        "category": "Copilot Custom Rules"
+      },
+      {
+        "command": "copilot-custom-rules.settings",
+        "title": "Open Settings",
+        "category": "Copilot Custom Rules"
       }
     ],
     "views": {
       "explorer": [
         {
-          "id": "copilot-custom-rules",
+          "id": "copilot-custom-rules-view",
           "name": "Copilot Custom Rules",
           "when": "workspaceHasFolder"
         }
@@ -61,7 +71,7 @@
     },
     "viewsWelcome": [
       {
-        "view": "copilot-custom-rules",
+        "view": "copilot-custom-rules-view",
         "contents": "Welcome to Copilot Custom Rules!\n\n[Open Rules Editor](command:copilot-custom-rules.openRulesEditor)\n[Inject Rules Now](command:copilot-custom-rules.injectRules)\n[Reset to Default](command:copilot-custom-rules.resetToDefault)"
       }
     ],
