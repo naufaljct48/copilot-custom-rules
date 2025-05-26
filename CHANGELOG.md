@@ -2,6 +2,21 @@
 
 All notable changes to the "Copilot Custom Rules" extension will be documented in this file.
 
+## [1.1.1] - 2024-12-19
+
+### Fixed
+
+- 🔧 **WebView UI in Sidebar**: Fixed missing WebView editor in sidebar for editing rules
+- 📝 **Rules Editor Display**: WebView editor now properly appears as "Rules Editor" panel in Explorer sidebar
+- 🎯 **Command Routing**: Fixed "Open Rules Editor" command to properly focus on WebView editor
+- ⚙️ **ESLint Configuration**: Added proper ESLint configuration for GitHub Actions workflow
+
+### Improved
+
+- 🎨 **Sidebar Layout**: Better organization with separate TreeView for actions and WebView for editing
+- 📋 **User Experience**: Users can now see both action buttons and the visual rules editor in sidebar
+- 🔄 **Editor Integration**: WebView editor properly loads, saves, and resets custom rules
+
 ## [1.1.0] - 2024-12-19
 
 ### Added

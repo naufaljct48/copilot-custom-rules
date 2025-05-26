@@ -2,7 +2,7 @@ import * as vscode from "vscode";
 import { FileManager } from "./fileManager";
 
 export class RulesEditorProvider implements vscode.WebviewViewProvider {
-  public static readonly viewType = "copilot-custom-rules-view";
+  public static readonly viewType = "copilot-custom-rules-editor";
   private _view?: vscode.WebviewView;
   private fileManager: FileManager;
 

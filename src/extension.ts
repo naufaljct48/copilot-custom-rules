@@ -35,7 +35,7 @@ export function activate(context: vscode.ExtensionContext) {
     "copilot-custom-rules.openRulesEditor",
     () => {
       vscode.commands.executeCommand("workbench.view.explorer");
-      vscode.commands.executeCommand("copilot-custom-rules-view.focus");
+      vscode.commands.executeCommand("copilot-custom-rules-editor.focus");
     }
   );
 
