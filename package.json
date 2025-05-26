@@ -2,7 +2,7 @@
   "name": "copilot-custom-rules",
   "displayName": "Copilot Custom Rules",
   "description": "Auto-inject custom rules for GitHub Copilot with editable UI sidebar",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "publisher": "naufaljct48",
   "engines": {
     "vscode": "^1.74.0"

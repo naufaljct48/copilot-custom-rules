@@ -2,6 +2,38 @@
 
 All notable changes to the "Copilot Custom Rules" extension will be documented in this file.
 
+## [1.1.2] - 2024-12-19
+
+### 🔧 Simplified File Management
+
+- **Single File System**: Removed unnecessary `.vscode/copilot-custom-rules.md` file
+- **Direct GitHub Integration**: Now uses only `.github/instructions/copilot.instructions.md` as the single source of truth
+- **Streamlined Workflow**: Edit rules directly in the GitHub Copilot instructions file
+- **No Duplication**: Eliminates confusion between multiple rule files
+
+### ✨ Improved User Experience
+
+- **Direct Editing**: WebView editor now directly edits `.github/instructions/copilot.instructions.md`
+- **Simplified Logic**: Removed unnecessary file copying and injection steps
+- **Better Performance**: Faster operations with single file management
+- **Cleaner Architecture**: More intuitive file structure
+
+### 🎯 How It Works Now
+
+1. **Default**: Extension creates `.github/instructions/copilot.instructions.md` with default rules
+2. **Edit**: WebView editor directly modifies the GitHub Copilot instructions file
+3. **Save**: Changes are saved directly to `.github/instructions/copilot.instructions.md`
+4. **Reset**: Overwrites the file with default rules
+
+### 📁 File Structure
+
+```
+project/
+└── .github/
+    └── instructions/
+        └── copilot.instructions.md  # Single source of truth
+```
+
 ## [1.1.1] - 2024-12-19
 
 ### Fixed
