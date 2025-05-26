@@ -1,0 +1,63 @@
+name: Publish to VS Code Marketplace
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to publish (e.g., 1.0.2)'
+        required: true
+        type: string
+      publish_marketplace:
+        description: 'Publish to VS Code Marketplace'
+        required: true
+        type: boolean
+        default: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Lint code
+      run: npm run lint
+      
+    - name: Compile TypeScript
+      run: npm run compile
+      
+    - name: Update version in package.json
+      run: |
+        npm version ${{ github.event.inputs.version }} --no-git-tag-version
+        
+    - name: Package extension
+      run: npm run package
+      
+    - name: Publish to VS Code Marketplace
+      if: ${{ github.event.inputs.publish_marketplace == 'true' }}
+      run: |
+        npx vsce publish --pat ${{ secrets.VSCE_PAT }}
+      env:
+        VSCE_PAT: ${{ secrets.VSCE_PAT }}
+        
+    - name: Create Git tag
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add package.json package-lock.json
+        git commit -m "Bump version to ${{ github.event.inputs.version }}"
+        git tag v${{ github.event.inputs.version }}
+        git push origin v${{ github.event.inputs.version }}
+        git push origin main

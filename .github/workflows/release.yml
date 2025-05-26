@@ -3,70 +3,95 @@ name: Release
 on:
   push:
     tags:
-      - 'v*'
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to release (e.g., 1.0.2)"
+        required: true
+        type: string
 
 jobs:
   release:
     runs-on: ubuntu-latest
-    
+    permissions:
+      contents: write
+
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
-      
-    - name: Setup Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '18'
-        
-    - name: Install dependencies
-      run: npm install
-      
-    - name: Compile TypeScript
-      run: npm run compile
-      
-    - name: Package extension
-      run: npm run package
-      
-    - name: Create Release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: ${{ github.ref }}
-        release_name: Release ${{ github.ref }}
-        body: |
-          ## Copilot Custom Rules v${{ github.ref_name }}
-          
-          ### Features
-          - 🚀 Auto-injection of custom rules on VS Code startup
-          - 📝 Visual rules editor in sidebar
-          - 🔄 Smart updates of existing instruction files
-          - 📁 GitHub Copilot integration with `.github/instructions/` folder
-          - 🙈 Automatic `.gitignore` management
-          
-          ### Installation
-          1. Download the `.vsix` file from this release
-          2. Open VS Code
-          3. Go to Extensions (Ctrl+Shift+X)
-          4. Click "..." menu and select "Install from VSIX..."
-          5. Select the downloaded `.vsix` file
-          
-          ### Usage
-          - Extension activates automatically when you open a workspace
-          - Custom rules are injected immediately on startup
-          - Use the sidebar panel to edit your custom rules
-          
-          See [README.md](https://github.com/naufaljct48/copilot-custom-rules/blob/main/README.md) for detailed documentation.
-        draft: false
-        prerelease: false
-        
-    - name: Upload VSIX file
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./copilot-custom-rules-*.vsix
-        asset_name: copilot-custom-rules-${{ github.ref_name }}.vsix
-        asset_content_type: application/zip
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint code
+        run: npm run lint
+
+      - name: Compile TypeScript
+        run: npm run compile
+
+      - name: Package extension
+        run: npm run package
+
+      - name: Get package version
+        id: package-version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+            echo "tag_name=v${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+          else
+            echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+            echo "tag_name=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Find VSIX file
+        id: find-vsix
+        run: |
+          VSIX_FILE=$(ls *.vsix | head -1)
+          echo "vsix_file=$VSIX_FILE" >> $GITHUB_OUTPUT
+          echo "Found VSIX file: $VSIX_FILE"
+
+      - name: Create Release
+        id: create_release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ steps.package-version.outputs.tag_name }}
+          name: "Copilot Custom Rules v${{ steps.package-version.outputs.version }}"
+          body: |
+            ## 🚀 Copilot Custom Rules v${{ steps.package-version.outputs.version }}
+
+            ### ✨ Features
+            - 🚀 Auto-injection of custom rules on VS Code startup
+            - 📝 Visual rules editor in sidebar
+            - 🔄 Smart updates of existing instruction files
+            - 📁 GitHub Copilot integration with `.github/instructions/` folder
+            - 🙈 Automatic `.gitignore` management
+
+            ### 📦 Installation
+            1. Download the `.vsix` file from this release
+            2. Open VS Code
+            3. Go to Extensions (Ctrl+Shift+X)
+            4. Click "..." menu and select "Install from VSIX..."
+            5. Select the downloaded `.vsix` file
+
+            ### 🎯 Usage
+            - Extension activates automatically when you open a workspace
+            - Custom rules are injected immediately on startup
+            - Use the sidebar panel to edit your custom rules
+
+            ### 📚 Documentation
+            See [README.md](https://github.com/naufaljct48/copilot-custom-rules/blob/main/README.md) for detailed documentation.
+
+            ### 🐛 Bug Reports
+            Found an issue? Please report it [here](https://github.com/naufaljct48/copilot-custom-rules/issues).
+          files: |
+            ${{ steps.find-vsix.outputs.vsix_file }}
+          draft: false
+          prerelease: false
+          generate_release_notes: true

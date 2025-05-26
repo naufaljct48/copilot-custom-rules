@@ -2,6 +2,32 @@
 
 All notable changes to the "Copilot Custom Rules" extension will be documented in this file.
 
+## [1.1.0] - 2024-12-19
+
+### Added
+
+- 🚀 **GitHub Actions Automated Release**: Workflow otomatis untuk build dan release file VSIX
+- 📦 **VSIX File in Releases**: File extension (.vsix) sekarang tersedia di GitHub releases
+- 🔄 **Manual Release Trigger**: Kemampuan untuk trigger release manual dari GitHub UI
+- 📝 **Enhanced Release Notes**: Format release notes yang lebih menarik dengan emoji dan instruksi instalasi
+- 🛍️ **VS Code Marketplace Workflow**: Workflow terpisah untuk publish ke VS Code Marketplace
+- 📋 **Release Documentation**: Panduan lengkap untuk melakukan release di RELEASE.md
+
+### Improved
+
+- ⚡ **Modern GitHub Actions**: Menggunakan actions versi terbaru (@v4) untuk performa lebih baik
+- 🔧 **Better Build Process**: Menambahkan lint check dan npm caching untuk build yang lebih cepat
+- 🎯 **Dynamic VSIX Detection**: Otomatis mencari dan upload file VSIX yang dibuat
+- 🔐 **Enhanced Permissions**: Proper permissions setup untuk GitHub Actions
+
+### Technical
+
+- Updated GitHub Actions to use latest versions
+- Added `contents: write` permission for release creation
+- Implemented `softprops/action-gh-release@v1` for better release management
+- Added npm caching for faster CI builds
+- Enhanced error handling in build process
+
 ## [1.0.1] - 2024-12-19
 
 ### Fixed
