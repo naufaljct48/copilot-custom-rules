@@ -2,6 +2,20 @@
 
 All notable changes to the "Copilot Custom Rules" extension will be documented in this file.
 
+## [1.2.4] - 2025-06-10
+
+### 🐛 Critical Bug Fix
+
+- **Fixed JavaScript Syntax Error**: Fixed missing newlines in webview JavaScript that prevented Reset button from working
+- **Enhanced Debugging**: Added comprehensive console logging for reset operations
+- **Improved Error Handling**: Better error detection and reporting for webview communication
+
+### 🔧 Technical Improvements
+
+- **WebView JavaScript**: Fixed syntax errors that broke event listener registration
+- **Reset Button Functionality**: Now properly loads DEFAULT_RULES content into textarea
+- **Console Logging**: Added detailed logging for troubleshooting reset operations
+
 ## [1.2.3] - 2025-06-10
 
 ### 🔧 Critical Fix - Reset Button

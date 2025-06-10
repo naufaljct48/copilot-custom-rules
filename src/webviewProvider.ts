@@ -198,8 +198,7 @@ export class RulesEditorProvider implements vscode.WebviewViewProvider {
         const status = document.getElementById('status');
 
         // Load rules on startup
-        vscode.postMessage({ type: 'loadRules' });
-        saveBtn.addEventListener('click', () => {
+        vscode.postMessage({ type: 'loadRules' });        saveBtn.addEventListener('click', () => {
             const content = editor.value;
             vscode.postMessage({
                 type: 'saveRules',
@@ -207,26 +206,30 @@ export class RulesEditorProvider implements vscode.WebviewViewProvider {
             });
             status.textContent = 'Saving rules...';
             saveBtn.disabled = true; // Disable during save
-        });resetBtn.addEventListener('click', () => {
+        });        resetBtn.addEventListener('click', () => {
             if (confirm('Are you sure you want to reset to default rules? This will overwrite your current custom rules.')) {
+                console.log('WebView: Reset button clicked, sending resetRules message');
                 vscode.postMessage({ type: 'resetRules' });
                 status.textContent = 'Resetting to default rules...';
                 editor.disabled = true; // Disable editor during reset
                 resetBtn.disabled = true; // Disable button during reset
                 saveBtn.disabled = true; // Disable save button during reset
             }
-        });        // Listen for messages from the extension
+        });
+
+        // Listen for messages from the extension
         window.addEventListener('message', event => {
             const message = event.data;
-            switch (message.type) {
-                case 'rulesLoaded':
+            switch (message.type) {                case 'rulesLoaded':
+                    console.log('WebView: Received rulesLoaded message, content length:', message.content?.length);
+                    console.log('WebView: Content preview:', message.content?.substring(0, 100) + '...');
                     editor.value = message.content;
                     editor.placeholder = 'Enter your custom rules here...';
                     editor.disabled = false; // Re-enable editor
                     resetBtn.disabled = false; // Re-enable reset button
                     saveBtn.disabled = false; // Re-enable save button
                     status.textContent = 'Rules loaded';
-                    console.log('WebView: Rules loaded, content length:', message.content.length);
+                    console.log('WebView: Rules loaded successfully, editor updated');
                     break;
                 case 'saveCompleted':
                     saveBtn.disabled = false; // Re-enable save button
