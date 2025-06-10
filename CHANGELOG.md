@@ -2,6 +2,24 @@
 
 All notable changes to the "Copilot Custom Rules" extension will be documented in this file.
 
+## [1.2.5] - 2025-06-10
+
+### 🐛 Major Bug Fix
+
+- **Complete Reset Button Fix**: Fixed the "Reset to Default" button functionality to properly update the textarea with the default English rules
+- **Enhanced Event Listeners**: Fixed JavaScript syntax errors in webviewProvider.ts that prevented proper event handling
+- **Robust Default Rules Retrieval**: Improved getDefaultRules() function to ensure it always returns the original English default rules
+- **Manual Reset Command**: Added command palette option "Force Reset to Default Rules (Fix)" as a fallback reset method
+- **Documentation**: Added comprehensive reset instructions and troubleshooting guide
+- **Cross-language Support**: Fixed issue where rules were stuck in Indonesian instead of resetting to English defaults
+
+### 🔧 Technical Improvements
+
+- **Error Handling**: Added robust error handling and verification for file operations
+- **Debug Logging**: Enhanced logging throughout the reset process for better troubleshooting
+- **Dual Reset Methods**: Implemented both async and sync file writing approaches for more reliable resets
+- **Content Verification**: Added verification steps to confirm reset success
+
 ## [1.2.4] - 2025-06-10
 
 ### 🐛 Critical Bug Fix

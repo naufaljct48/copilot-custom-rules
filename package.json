@@ -2,7 +2,7 @@
   "name": "copilot-custom-rules",
   "displayName": "Copilot Custom Rules",
   "description": "Auto-inject custom rules for GitHub Copilot with editable UI sidebar",
-  "version": "1.2.4",
+  "version": "1.2.5",
   "publisher": "naufaljct48",
   "engines": {
     "vscode": "^1.74.0"
@@ -57,6 +57,11 @@
       {
         "command": "copilot-custom-rules.settings",
         "title": "Open Settings",
+        "category": "Copilot Custom Rules"
+      },
+      {
+        "command": "copilot-custom-rules.manualForceReset",
+        "title": "Force Reset to Default Rules (Fix)",
         "category": "Copilot Custom Rules"
       }
     ],

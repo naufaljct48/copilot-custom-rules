@@ -209,23 +209,144 @@ export class FileManager {
   }
   async resetToDefault(): Promise<void> {
     try {
-      console.log("FileManager.resetToDefault: Resetting to DEFAULT_RULES");
-      await this.saveCustomRules(DEFAULT_RULES);
+      console.log("FileManager.resetToDefault: Starting reset process");
+
+      // Get fresh DEFAULT_RULES directly from the module
+      const { DEFAULT_RULES: originalRules } = require("./defaultRules");
+
+      console.log(
+        "FileManager.resetToDefault: DEFAULT_RULES length:",
+        DEFAULT_RULES.length
+      );
+      console.log(
+        "FileManager.resetToDefault: DEFAULT_RULES preview:",
+        DEFAULT_RULES.substring(0, 100) + "..."
+      );
+      console.log(
+        "FileManager.resetToDefault: originalRules length:",
+        originalRules.length
+      );
+      console.log(
+        "FileManager.resetToDefault: originalRules preview:",
+        originalRules.substring(0, 100) + "..."
+      );
+
+      // Ensure directory exists
+      await this.ensureDirectoryExists(this.instructionsDir);
+
+      // Use the direct import to ensure we get the English version
+      const rulesContent = originalRules;
+
+      console.log(
+        "FileManager.resetToDefault: Writing to file with length:",
+        rulesContent.length
+      );
+      console.log(
+        "FileManager.resetToDefault: Writing preview:",
+        rulesContent.substring(0, 100) + "..."
+      );
+
+      // Write to file
+      await fs.promises.writeFile(this.instructionsFile, rulesContent, "utf8");
+
       console.log("FileManager.resetToDefault: Reset completed successfully");
+      console.log("FileManager.resetToDefault: Verifying file content...");
+
+      // Verify file content was updated correctly
+      if (fs.existsSync(this.instructionsFile)) {
+        const content = await fs.promises.readFile(
+          this.instructionsFile,
+          "utf8"
+        );
+        console.log(
+          "FileManager.resetToDefault: File content length after reset:",
+          content.length
+        );
+        console.log(
+          "FileManager.resetToDefault: Content preview after reset:",
+          content.substring(0, 100) + "..."
+        );
+
+        // Double check if content equals rulesContent
+        const isEqual = content.trim() === rulesContent.trim();
+        console.log(
+          "FileManager.resetToDefault: Content equals rulesContent:",
+          isEqual
+        );
+
+        if (!isEqual) {
+          console.error(
+            "FileManager.resetToDefault: Content mismatch after reset!"
+          );
+          // Try once more with synchronous approach
+          console.log(
+            "FileManager.resetToDefault: Trying direct synchronous write..."
+          );
+          fs.writeFileSync(this.instructionsFile, rulesContent, "utf8");
+
+          // Verify again
+          const contentAfterSync = fs.readFileSync(
+            this.instructionsFile,
+            "utf8"
+          );
+          console.log(
+            "FileManager.resetToDefault: Content after sync write matches:",
+            contentAfterSync.trim() === rulesContent.trim()
+          );
+        }
+      }
+
       vscode.window.showInformationMessage(
         "Rules reset to default successfully!"
       );
+
+      return Promise.resolve(); // Ensure we always return a resolved promise
     } catch (error) {
       console.error("Error resetting rules:", error);
       vscode.window.showErrorMessage(`Failed to reset rules: ${error}`);
       throw error; // Re-throw to let webview handle the error
     }
   }
-
   async getDefaultRules(): Promise<string> {
     console.log(
       "FileManager.getDefaultRules: Returning DEFAULT_RULES directly"
     );
+    console.log(
+      "FileManager.getDefaultRules: DEFAULT_RULES length:",
+      DEFAULT_RULES.length
+    );
+    console.log(
+      "FileManager.getDefaultRules: DEFAULT_RULES preview:",
+      DEFAULT_RULES.substring(0, 100) + "..."
+    );
+
+    // Make sure we return the original value from the DEFAULT_RULES constant without manipulation
+    // Directly import it from the module to ensure we get the English version
+    const { DEFAULT_RULES: originalRules } = require("./defaultRules");
+
+    console.log(
+      "FileManager.getDefaultRules: originalRules length:",
+      originalRules.length
+    );
+    console.log(
+      "FileManager.getDefaultRules: originalRules preview:",
+      originalRules.substring(0, 100) + "..."
+    );
+
+    // Compare with the imported DEFAULT_RULES to ensure they match
+    const areEqual = originalRules === DEFAULT_RULES;
+    console.log(
+      "FileManager.getDefaultRules: originalRules === DEFAULT_RULES:",
+      areEqual
+    );
+
+    if (!areEqual) {
+      console.warn(
+        "FileManager.getDefaultRules: Rules mismatch detected, using original import"
+      );
+      return originalRules;
+    }
+
     return DEFAULT_RULES;
   }
 

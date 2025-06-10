@@ -75,6 +75,13 @@ export class RulesEditorProvider implements vscode.WebviewViewProvider {
               "WebView.resetRules: Loading default rules, length:",
               defaultRules.length
             );
+            console.log(
+              "WebView.resetRules: Default rules preview:",
+              defaultRules.substring(0, 100) + "..."
+            );
+            console.log(
+              "WebView.resetRules: Sending rulesLoaded message to webview"
+            );
             webviewView.webview.postMessage({
               type: "rulesLoaded",
               content: defaultRules,
@@ -82,6 +89,15 @@ export class RulesEditorProvider implements vscode.WebviewViewProvider {
             console.log(
               "WebView.resetRules: Reset completed and webview updated"
             );
+
+            // Force update UI elements state
+            setTimeout(() => {
+              console.log("WebView.resetRules: Sending status update");
+              webviewView.webview.postMessage({
+                type: "updateStatus",
+                status: "Rules reset to default successfully",
+              });
+            }, 500);
           } catch (error) {
             console.error("WebView.resetRules: Error:", error);
             vscode.window.showErrorMessage(`Failed to reset rules: ${error}`);
@@ -177,8 +193,7 @@ export class RulesEditorProvider implements vscode.WebviewViewProvider {
         }
     </style>
 </head>
-<body>
-    <div class="container">
+<body>    <div class="container">
         <div class="header">
             <div class="title">Custom Rules Editor</div>
             <div class="buttons">
@@ -198,7 +213,9 @@ export class RulesEditorProvider implements vscode.WebviewViewProvider {
         const status = document.getElementById('status');
 
         // Load rules on startup
-        vscode.postMessage({ type: 'loadRules' });        saveBtn.addEventListener('click', () => {
+        vscode.postMessage({ type: 'loadRules' });
+        
+        saveBtn.addEventListener('click', () => {
             const content = editor.value;
             vscode.postMessage({
                 type: 'saveRules',
@@ -206,7 +223,8 @@ export class RulesEditorProvider implements vscode.WebviewViewProvider {
             });
             status.textContent = 'Saving rules...';
             saveBtn.disabled = true; // Disable during save
-        });        resetBtn.addEventListener('click', () => {
+        });
+          resetBtn.addEventListener('click', () => {
             if (confirm('Are you sure you want to reset to default rules? This will overwrite your current custom rules.')) {
                 console.log('WebView: Reset button clicked, sending resetRules message');
                 vscode.postMessage({ type: 'resetRules' });
@@ -216,20 +234,33 @@ export class RulesEditorProvider implements vscode.WebviewViewProvider {
                 saveBtn.disabled = true; // Disable save button during reset
             }
         });
-
+        
         // Listen for messages from the extension
         window.addEventListener('message', event => {
             const message = event.data;
+            console.log('WebView: Received message type:', message.type);
+            
             switch (message.type) {                case 'rulesLoaded':
                     console.log('WebView: Received rulesLoaded message, content length:', message.content?.length);
                     console.log('WebView: Content preview:', message.content?.substring(0, 100) + '...');
-                    editor.value = message.content;
-                    editor.placeholder = 'Enter your custom rules here...';
+                    
+                    // Ensure content is not empty before updating the editor
+                    if (message.content && message.content.length > 0) {
+                        console.log('WebView: Updating editor value with new content');
+                        editor.value = message.content;
+                        editor.placeholder = 'Enter your custom rules here...';
+                        status.textContent = 'Rules loaded';
+                        console.log('WebView: Editor value updated successfully');
+                    } else {
+                        console.error('WebView: Received empty content in rulesLoaded message');
+                        status.textContent = 'Error: Received empty rules content';
+                    }
+                    
+                    // Always re-enable UI elements 
                     editor.disabled = false; // Re-enable editor
                     resetBtn.disabled = false; // Re-enable reset button
                     saveBtn.disabled = false; // Re-enable save button
-                    status.textContent = 'Rules loaded';
-                    console.log('WebView: Rules loaded successfully, editor updated');
+                    console.log('WebView: UI elements re-enabled');
                     break;
                 case 'saveCompleted':
                     saveBtn.disabled = false; // Re-enable save button
@@ -238,6 +269,10 @@ export class RulesEditorProvider implements vscode.WebviewViewProvider {
                     } else {
                         status.textContent = 'Failed to save rules';
                     }
+                    break;
+                case 'updateStatus':
+                    status.textContent = message.status;
+                    console.log('WebView: Status updated to:', message.status);
                     break;
             }
         });

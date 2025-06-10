@@ -3,6 +3,7 @@ import { FileManager } from "./fileManager";
 import { GitignoreManager } from "./gitignoreManager";
 import { RulesEditorProvider } from "./webviewProvider";
 import { CopilotRulesTreeDataProvider } from "./treeDataProvider";
+import { manualResetToDefault } from "./fixReset";
 
 let fileManager: FileManager;
 let gitignoreManager: GitignoreManager;
@@ -74,16 +75,42 @@ export function activate(context: vscode.ExtensionContext) {
               break;
             case "reset":
               try {
+                console.log(
+                  "Extension: Reset button clicked, resetting to default"
+                );
                 await fileManager.resetToDefault();
-                const defaultRules = await fileManager.getCustomRules();
-                panel.webview.postMessage({
-                  command: "loadRules",
-                  content: defaultRules,
-                });
+                // Get DEFAULT_RULES directly instead of reading from file
+                const defaultRules = await fileManager.getDefaultRules();
+                console.log(
+                  "Extension: Loading default rules, length:",
+                  defaultRules.length
+                );
+                console.log(
+                  "Extension: Default rules preview:",
+                  defaultRules.substring(0, 100) + "..."
+                );
+                console.log(
+                  "Extension: About to post message to panel webview"
+                );
+                // Kirim pesan dengan detail untuk debug
+                try {
+                  panel.webview.postMessage({
+                    command: "loadRules",
+                    content: defaultRules,
+                  });
+                  console.log("Extension: loadRules message posted to webview");
+                } catch (msgError) {
+                  console.error(
+                    "Extension: Error posting message to webview:",
+                    msgError
+                  );
+                }
+
                 vscode.window.showInformationMessage(
                   "Rules reset to default successfully!"
                 );
               } catch (error) {
+                console.error("Extension: Reset error:", error);
                 vscode.window.showErrorMessage(
                   `Failed to reset rules: ${error}`
                 );
@@ -108,7 +135,6 @@ export function activate(context: vscode.ExtensionContext) {
       }
     }
   );
-
   const resetToDefault = vscode.commands.registerCommand(
     "copilot-custom-rules.resetToDefault",
     async () => {
@@ -119,7 +145,72 @@ export function activate(context: vscode.ExtensionContext) {
       );
 
       if (result === "Yes") {
-        await fileManager.resetToDefault();
+        try {
+          console.log("TreeView Reset: Starting reset to default");
+          // Reset the file
+          await fileManager.resetToDefault();
+
+          // Get default rules directly for UI updates
+          const defaultRules = await fileManager.getDefaultRules();
+          console.log(
+            "TreeView Reset: Got default rules, length:",
+            defaultRules.length
+          ); // Try to update sidebar WebView if it's open
+          try {
+            // Try to find the sidebar WebView if it exists
+            // Note: We can't directly access private properties, so we'll log the fact
+            console.log(
+              "TreeView Reset: Attempting to update sidebar WebView if exists"
+            );
+
+            // Buat UI notification untuk meminta user refresh sidebar WebView
+            vscode.window
+              .showInformationMessage(
+                "Rules reset to default. Please reopen the editor to see changes.",
+                "Open Rules Editor"
+              )
+              .then((selection) => {
+                if (selection === "Open Rules Editor") {
+                  vscode.commands.executeCommand(
+                    "copilot-custom-rules.openRulesEditor"
+                  );
+                }
+              });
+          } catch (webviewError) {
+            console.log(
+              "TreeView Reset: No active WebView found or couldn't update it"
+            );
+          } // If there's an open editor with the rules file, reload it
+          const editors = vscode.window.visibleTextEditors.filter(
+            (editor) =>
+              editor.document.uri.fsPath ===
+              fileManager.getCustomRulesFilePath()
+          );
+
+          if (editors.length > 0) {
+            console.log(
+              "TreeView Reset: Found open rule file editor, will reload"
+            );
+            // Reload the document content in the editor
+            vscode.commands.executeCommand("workbench.action.files.revert");
+          }
+
+          // Force refresh all webviews by creating a new one
+          vscode.commands
+            .executeCommand("workbench.action.closeAllEditors")
+            .then(() => {
+              vscode.commands.executeCommand(
+                "copilot-custom-rules.openRulesEditor"
+              );
+            });
+
+          vscode.window.showInformationMessage(
+            "Rules reset to default successfully!"
+          );
+        } catch (error) {
+          console.error("TreeView Reset: Error during reset:", error);
+          vscode.window.showErrorMessage(`Failed to reset rules: ${error}`);
+        }
       }
     }
   );
@@ -152,13 +243,19 @@ export function activate(context: vscode.ExtensionContext) {
       );
     }
   );
+  // Manual force reset command
+  const manualForceReset = vscode.commands.registerCommand(
+    "copilot-custom-rules.manualForceReset",
+    manualResetToDefault
+  );
 
   context.subscriptions.push(
     openRulesEditor,
     injectRules,
     resetToDefault,
     editRules,
-    openSettings
+    openSettings,
+    manualForceReset
   );
 
   // Auto-inject on startup if enabled
@@ -377,15 +474,18 @@ function getWebviewContent(currentRules: string): string {
                 vscode.postMessage({ command: 'reset' });
                 status.textContent = 'Resetting to default rules...';
             }
-        });
-
-        // Listen for messages from the extension
+        });        // Listen for messages from the extension
         window.addEventListener('message', event => {
             const message = event.data;
+            console.log('WebView Panel: Received message type:', message.command);
+            
             switch (message.command) {
                 case 'loadRules':
+                    console.log('WebView Panel: Received loadRules message, content length:', message.content?.length);
+                    console.log('WebView Panel: Content preview:', message.content?.substring(0, 100) + '...');
                     editor.value = message.content;
                     status.textContent = 'Rules loaded successfully';
+                    console.log('WebView Panel: Editor updated with new content');
                     break;
             }
         });
