@@ -2,6 +2,28 @@
 
 All notable changes to the "Copilot Custom Rules" extension will be documented in this file.
 
+## [1.2.2] - 2025-06-10
+
+### 🔧 Bug Fixes & Improvements
+
+- **Fixed Reset Button**: Reset to Default button now properly loads DEFAULT_RULES into the editor
+- **Improved Override Logic**: Enhanced file override logic to better preserve custom user modifications
+- **Enhanced User Experience**: Added better UI feedback with disabled buttons during operations
+- **Better Error Handling**: Improved error handling and logging throughout the application
+- **Consistent File Management**: Fixed logic for when to override copilot.instructions.md with DEFAULT_RULES
+
+### 🛡️ Custom Rules Protection
+
+- **Smart Override Detection**: System now properly detects when custom rules have been modified
+- **Preservation Logic**: Custom modifications are now properly preserved unless explicitly reset
+- **Status Feedback**: Added clear status messages for save/reset operations
+
+### 🐛 Technical Fixes
+
+- **WebView Communication**: Fixed message passing between extension and webview
+- **File State Management**: Improved file state tracking and validation
+- **Logging Enhancement**: Added comprehensive logging for debugging and monitoring
+
 ## [1.2.1] - 2025-06-10
 
 ### 🧹 Code Cleanup & Optimization

@@ -26,7 +26,6 @@ export class FileManager {
       await fs.promises.mkdir(dirPath, { recursive: true });
     }
   }
-
   async validateFileIntegrity(): Promise<boolean> {
     try {
       if (!fs.existsSync(this.instructionsFile)) {
@@ -48,6 +47,67 @@ export class FileManager {
       return false;
     }
   }
+
+  async isModifiedFromDefault(): Promise<boolean> {
+    try {
+      if (!fs.existsSync(this.instructionsFile)) {
+        return false; // No file means not modified
+      }
+
+      const content = await fs.promises.readFile(this.instructionsFile, "utf8");
+      const trimmedContent = content.trim();
+      const trimmedDefault = DEFAULT_RULES.trim();
+
+      const isModified = trimmedContent !== trimmedDefault;
+      console.log(
+        "FileManager.isModifiedFromDefault: Content modified from default:",
+        isModified
+      );
+
+      return isModified;
+    } catch (error) {
+      console.error("FileManager.isModifiedFromDefault: Error:", error);
+      return false;
+    }
+  }
+
+  async shouldOverrideWithDefault(): Promise<boolean> {
+    try {
+      // Check if file exists
+      if (!fs.existsSync(this.instructionsFile)) {
+        return true; // Should create with default
+      }
+
+      // Check if content is empty
+      const content = await fs.promises.readFile(this.instructionsFile, "utf8");
+      const trimmedContent = content.trim();
+
+      if (!trimmedContent) {
+        console.log(
+          "FileManager.shouldOverrideWithDefault: Empty file, should override"
+        );
+        return true;
+      }
+
+      // If content exists and is different from default, don't override
+      // This preserves user modifications
+      const isModified = await this.isModifiedFromDefault();
+      const shouldOverride = !isModified;
+
+      console.log(
+        "FileManager.shouldOverrideWithDefault: Should override:",
+        shouldOverride,
+        "Is modified:",
+        isModified
+      );
+
+      return shouldOverride;
+    } catch (error) {
+      console.error("FileManager.shouldOverrideWithDefault: Error:", error);
+      return true; // Default to override on error
+    }
+  }
+
   async getCustomRules(): Promise<string> {
     try {
       if (fs.existsSync(this.instructionsFile)) {
@@ -67,19 +127,29 @@ export class FileManager {
           trimmedContent.substring(0, 100) + "..."
         );
 
-        // Return content even if it's different from DEFAULT_RULES
-        // This preserves user's custom changes
-        return trimmedContent || DEFAULT_RULES;
+        // Check if content is empty or just whitespace
+        if (!trimmedContent) {
+          console.log(
+            "FileManager.getCustomRules: Empty file, using DEFAULT_RULES"
+          );
+          await this.saveCustomRules(DEFAULT_RULES);
+          return DEFAULT_RULES;
+        }
+
+        // Return existing content (preserves user modifications)
+        return trimmedContent;
       } else {
         console.log(
-          "FileManager.getCustomRules: File does not exist, returning DEFAULT_RULES"
+          "FileManager.getCustomRules: File does not exist, creating with DEFAULT_RULES"
         );
+        await this.ensureDirectoryExists(this.instructionsDir);
+        await this.saveCustomRules(DEFAULT_RULES);
+        return DEFAULT_RULES;
       }
     } catch (error) {
       console.error("Error reading custom rules:", error);
+      return DEFAULT_RULES;
     }
-    // Only return DEFAULT_RULES if file doesn't exist
-    return DEFAULT_RULES;
   }
   async saveCustomRules(content: string): Promise<void> {
     try {
@@ -104,49 +174,44 @@ export class FileManager {
       // Ensure .github/instructions directory exists
       await this.ensureDirectoryExists(this.instructionsDir);
 
-      // Check if instructions file exists
-      if (!fs.existsSync(this.instructionsFile)) {
-        // Only create with default rules if file doesn't exist
-        console.log(
-          "FileManager.injectRules: File doesn't exist, creating with DEFAULT_RULES"
-        );
+      // Check if should override with default rules
+      const shouldOverride = await this.shouldOverrideWithDefault();
+
+      if (shouldOverride) {
+        console.log("FileManager.injectRules: Overriding with DEFAULT_RULES");
         await fs.promises.writeFile(
           this.instructionsFile,
           DEFAULT_RULES,
           "utf8"
         );
         vscode.window.showInformationMessage(
-          "Custom rules file created with default rules!"
+          "Instructions file updated with default rules!"
         );
       } else {
-        // File exists - preserve existing content, NEVER overwrite
+        // File exists and has custom content - preserve it
         const existingContent = await fs.promises.readFile(
           this.instructionsFile,
           "utf8"
         );
         console.log(
-          "FileManager.injectRules: File exists, preserving content. Length:",
+          "FileManager.injectRules: Preserving custom content. Length:",
           existingContent.length
         );
-        console.log(
-          "FileManager.injectRules: Content preview:",
-          existingContent.substring(0, 100) + "..."
-        );
 
-        // Do NOT write anything - just ensure directory exists
         vscode.window.showInformationMessage(
-          "Custom rules file ready! Your custom rules are preserved."
+          "Custom instructions preserved - no changes made."
         );
       }
     } catch (error) {
-      console.error("Error ensuring rules file:", error);
-      vscode.window.showErrorMessage(`Failed to ensure rules file: ${error}`);
+      console.error("Error injecting rules:", error);
+      vscode.window.showErrorMessage(`Failed to inject rules: ${error}`);
     }
   }
-
   async resetToDefault(): Promise<void> {
     try {
+      console.log("FileManager.resetToDefault: Resetting to DEFAULT_RULES");
       await this.saveCustomRules(DEFAULT_RULES);
+      console.log("FileManager.resetToDefault: Reset completed successfully");
       vscode.window.showInformationMessage(
         "Rules reset to default successfully!"
       );

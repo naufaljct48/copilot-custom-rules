@@ -48,22 +48,41 @@ export class RulesEditorProvider implements vscode.WebviewViewProvider {
             );
             await this.fileManager.saveCustomRules(data.content);
             await this.fileManager.injectRules();
+            console.log("WebView.saveRules: Save and inject completed");
             vscode.window.showInformationMessage(
               "Rules saved and injected successfully!"
             );
+            webviewView.webview.postMessage({
+              type: "saveCompleted",
+              success: true,
+            });
           } catch (error) {
+            console.error("WebView.saveRules: Error:", error);
             vscode.window.showErrorMessage(`Failed to save rules: ${error}`);
+            webviewView.webview.postMessage({
+              type: "saveCompleted",
+              success: false,
+            });
           }
           break;
         case "resetRules":
           try {
+            console.log("WebView.resetRules: Starting reset process");
             await this.fileManager.resetToDefault();
             const defaultRules = await this.fileManager.getCustomRules();
+            console.log(
+              "WebView.resetRules: Loading default rules, length:",
+              defaultRules.length
+            );
             webviewView.webview.postMessage({
               type: "rulesLoaded",
               content: defaultRules,
             });
+            console.log(
+              "WebView.resetRules: Reset completed and webview updated"
+            );
           } catch (error) {
+            console.error("WebView.resetRules: Error:", error);
             vscode.window.showErrorMessage(`Failed to reset rules: ${error}`);
           }
           break;
@@ -178,32 +197,42 @@ export class RulesEditorProvider implements vscode.WebviewViewProvider {
         const status = document.getElementById('status');
 
         // Load rules on startup
-        vscode.postMessage({ type: 'loadRules' });
-
-        saveBtn.addEventListener('click', () => {
+        vscode.postMessage({ type: 'loadRules' });        saveBtn.addEventListener('click', () => {
             const content = editor.value;
             vscode.postMessage({
                 type: 'saveRules',
                 content: content
             });
-            status.textContent = 'Saving...';
-        });
-
-        resetBtn.addEventListener('click', () => {
+            status.textContent = 'Saving rules...';
+            saveBtn.disabled = true; // Disable during save
+        });resetBtn.addEventListener('click', () => {
             if (confirm('Are you sure you want to reset to default rules? This will overwrite your current custom rules.')) {
                 vscode.postMessage({ type: 'resetRules' });
-                status.textContent = 'Resetting...';
+                status.textContent = 'Resetting to default rules...';
+                editor.disabled = true; // Disable editor during reset
+                resetBtn.disabled = true; // Disable button during reset
+                saveBtn.disabled = true; // Disable save button during reset
             }
-        });
-
-        // Listen for messages from the extension
+        });        // Listen for messages from the extension
         window.addEventListener('message', event => {
             const message = event.data;
             switch (message.type) {
                 case 'rulesLoaded':
                     editor.value = message.content;
                     editor.placeholder = 'Enter your custom rules here...';
+                    editor.disabled = false; // Re-enable editor
+                    resetBtn.disabled = false; // Re-enable reset button
+                    saveBtn.disabled = false; // Re-enable save button
                     status.textContent = 'Rules loaded';
+                    console.log('WebView: Rules loaded, content length:', message.content.length);
+                    break;
+                case 'saveCompleted':
+                    saveBtn.disabled = false; // Re-enable save button
+                    if (message.success) {
+                        status.textContent = 'Rules saved successfully';
+                    } else {
+                        status.textContent = 'Failed to save rules';
+                    }
                     break;
             }
         });
