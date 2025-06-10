@@ -69,7 +69,8 @@ export class RulesEditorProvider implements vscode.WebviewViewProvider {
           try {
             console.log("WebView.resetRules: Starting reset process");
             await this.fileManager.resetToDefault();
-            const defaultRules = await this.fileManager.getCustomRules();
+            // Get DEFAULT_RULES directly instead of reading from file
+            const defaultRules = await this.fileManager.getDefaultRules();
             console.log(
               "WebView.resetRules: Loading default rules, length:",
               defaultRules.length
@@ -197,7 +198,8 @@ export class RulesEditorProvider implements vscode.WebviewViewProvider {
         const status = document.getElementById('status');
 
         // Load rules on startup
-        vscode.postMessage({ type: 'loadRules' });        saveBtn.addEventListener('click', () => {
+        vscode.postMessage({ type: 'loadRules' });
+        saveBtn.addEventListener('click', () => {
             const content = editor.value;
             vscode.postMessage({
                 type: 'saveRules',

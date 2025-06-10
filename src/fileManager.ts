@@ -218,7 +218,15 @@ export class FileManager {
     } catch (error) {
       console.error("Error resetting rules:", error);
       vscode.window.showErrorMessage(`Failed to reset rules: ${error}`);
+      throw error; // Re-throw to let webview handle the error
     }
+  }
+
+  async getDefaultRules(): Promise<string> {
+    console.log(
+      "FileManager.getDefaultRules: Returning DEFAULT_RULES directly"
+    );
+    return DEFAULT_RULES;
   }
 
   getInstructionsFilePath(): string {

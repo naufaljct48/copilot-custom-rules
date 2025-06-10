@@ -2,6 +2,21 @@
 
 All notable changes to the "Copilot Custom Rules" extension will be documented in this file.
 
+## [1.2.3] - 2025-06-10
+
+### 🔧 Critical Fix - Reset Button
+
+- **Fixed Reset Button Functionality**: Reset to Default button now properly loads DEFAULT_RULES into the editor
+- **Direct DEFAULT_RULES Loading**: Added `getDefaultRules()` method to ensure reset always loads fresh default rules
+- **Improved Reset Logic**: Reset now bypasses file reading and directly loads DEFAULT_RULES content
+- **Enhanced Debugging**: Added better logging to track reset operations
+
+### 🐛 Technical Improvements
+
+- **Reliable Reset Operation**: Reset button now consistently loads the correct default content
+- **Better Error Handling**: Enhanced error handling for reset operations
+- **Consistent Behavior**: Reset button behavior is now predictable and reliable
+
 ## [1.2.2] - 2025-06-10
 
 ### 🔧 Bug Fixes & Improvements
