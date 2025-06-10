@@ -15,3 +15,6 @@ Thumbs.db
 
 # Copilot Custom Rules - Instructions files
 .github/instructions/
+
+# Task Master - Local task management files
+.taskmaster/

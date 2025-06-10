@@ -2,59 +2,83 @@ export const DEFAULT_RULES = `# AI Agent Rules
 
 ## Language and Communication
 
-1. Use the language according to the user's input that is easy to understand and clear.
-2. Provide direct answers without excessive explanation.
-3. Avoid using technical terms without explanation.
-4. The system used is Windows.
+1.  Use the same language as the user input with clear and understandable communication.
+2.  Provide direct answers without excessive explanation.
+3.  Avoid technical terms without explanation.
+4.  System used is Windows.
 
 ## Code Structure
 
-1. Use a clear architecture (MVC, MVVM, Clean Architecture) as needed.
-2. Separate code based on functionality (components, services, models, utils).
-3. Apply the DRY principle (Don't Repeat Yourself).
-4. Implement modularization for easier maintenance.
+1.  Use clear architecture (MVC, MVVM, Clean Architecture) as needed.
+2.  Separate code based on function (components, services, models, utils).
+3.  Apply DRY (Don't Repeat Yourself) principle.
+4.  Implement modularization for easy maintenance.
 
-## Initialization
+## Task Master System
 
-1. Upon starting, the agent must read all files in the memory bank.
-2. The agent must read \`Todo.md\` to understand current tasks and their status.
-3. If there is no Memory Bank or \`Todo.md\`, the agent must create them based on the user's input.
-4. The \`Todo.md\` format must follow a consistent structure using checkboxes.
+### Initialization and Setup
+1.  **Check Directory**: Check if \`.taskmaster\` already exists in root project.
+2.  **Auto-Initialize**: If not exists, create folder structure:
+    \`\`\`
+    .taskmaster/
+    ├── config/settings.json
+    ├── docs/prd.txt
+    ├── tasks/task001.txt...task020.txt
+    └── status/summary.md
+    \`\`\`
+3.  **Load Configuration**: Read settings.json to know project status.
 
-## Memory Bank
+### Task Breakdown Methodology
+4.  **Input Analysis**: When user provides new task:
+    - Parse requirement into specific subtasks
+    - Estimate complexity and dependencies
+    - Assign priority (High/Medium/Low)
+5.  **Create Task Files**: Create files task001.txt to task020.txt with format:
+    \`\`\`
+    **Task ID**: 001
+    **Title**: [Task Title]
+    **Priority**: High/Medium/Low
+    **Status**: pending/in-progress/completed/blocked/cancelled
+    **Assigned**: AI Agent
+    **Created**: YYYY-MM-DD
+    **Updated**: YYYY-MM-DD
+    
+    ## Description
+    [Detailed description]
+    
+    ## Acceptance Criteria
+    - [ ] Criteria 1
+    - [ ] Criteria 2
+    
+    ## Implementation Details
+    [Technical details]
+    
+    ## Files Modified
+    [List of files]
+    
+    ## Testing
+    [Test cases]
+    
+    ## Notes
+    [Additional notes]
+    \`\`\`
 
-1. The memory bank contains all permanent information about the project and ongoing conversations.
-2. The agent must refer to the memory bank file to maintain context across sessions.
-3. The agent must update the relevant memory files after any meaningful interaction.
+### Execution Flow
+6.  **Status Check**: Before starting, check all task status in \`.taskmaster/tasks/\`.
+7.  **Work on Pending**: Select task with "pending" status based on priority.
+8.  **Update Status**: Change status to "in-progress" when starting work.
+9.  **Complete Tasks**: Mark as "completed" after finished.
+10. **Track Progress**: Update summary.md with overall progress.
 
-## Todo Management
+### File Management
+11. **Consistent Format**: Use naming convention task001.txt, task002.txt, etc.
+12. **Status Tracking**: Update timestamp and status every time there's a change.
+13. **Dependencies**: Track task dependencies in implementation details.
+14. **Documentation**: Update PRD if there are scope changes.
+15. **Gitignore Management**: Ensure \`.taskmaster/\` is included in \`.gitignore\` to avoid committing local task files.
 
-1. The agent must read \`Todo.md\` at the beginning of every session.
-2. For completed tasks:
-   - Mark them with a checkbox: [x]
-   - Do not modify completed tasks.
-3. For incomplete tasks:
-   - Maintain the format: [ ] (with a space between the brackets)
-   - Do not mark as complete unless explicitly confirmed by the user.
-4. When adding new tasks:
-   - Add the task with an unchecked checkbox: [ ]
-   - Include a brief description of the task.
-
-## Session Flow
-
-1. Start each session by greeting the user and providing a brief summary of the current project.
-2. Reference any pending tasks from \`Todo.md\` that may require attention.
-3. When continuing work on a project, reference previous work to maintain continuity.
-4. At the end of each session, summarize what has been accomplished and highlight remaining tasks.
-
-## Response Format
-
-1. Keep responses short and to the point.
-2. When discussing tasks from \`Todo.md\`, reference them by their exact name.
-3. Clearly indicate when a task is completed and will be marked accordingly in \`Todo.md\`.
-
-## File Handling
-
-1. Always confirm before creating a new file for the memory bank.
-2. Use consistent naming conventions for all files.
-3. Suggest archiving old or completed project files when appropriate.`;
+### Command Execution
+16. **Full Control**: AI Agent has full access to run all commands.
+17. **File Operations**: Create, read, update, delete files as needed.
+18. **Tool Usage**: Use all available tools to complete tasks.
+19. **Error Handling**: Handle errors with graceful degradation.`;

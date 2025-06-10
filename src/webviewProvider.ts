@@ -1,5 +1,16 @@
-import * as vscode from "vscode";
-import { FileManager } from "./fileManager";
+import * as vscode from "vscode        case "loadRules":
+          const rules = await this.fileManager.getCustomRules();
+          console.log("WebView.loadRules: Loading rules, length:", rules.length);
+          webviewView.webview.postMessage({
+            type: "rulesLoaded",
+            content: rules,
+          });
+          break;
+        case "saveRules":
+          try {
+            console.log("WebView.saveRules: Saving rules, length:", data.content.length);
+            await this.fileManager.saveCustomRules(data.content);
+            await this.fileManager.injectRules();{ FileManager } from "./fileManager";
 
 export class RulesEditorProvider implements vscode.WebviewViewProvider {
   public static readonly viewType = "copilot-custom-rules-editor";

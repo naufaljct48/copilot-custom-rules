@@ -2,6 +2,56 @@
 
 All notable changes to the "Copilot Custom Rules" extension will be documented in this file.
 
+## [1.2.0] - 2025-06-10
+
+### 🎯 Task Master System Integration
+
+- **Complete Task Management**: Integrated comprehensive Task Master system for project management
+- **Auto-Initialize Structure**: Automatic creation of `.taskmaster/` folder with organized structure
+- **Task Breakdown Methodology**: Intelligent task breakdown into subtasks with priority and status tracking
+- **Progress Tracking**: Real-time progress monitoring with summary reports
+
+### 🔧 Enhanced File Persistence
+
+- **Fixed Persistence Issues**: Resolved bug where custom rules would revert after VS Code restart
+- **Enhanced File Operations**: Improved file read/write operations with comprehensive logging
+- **Never Overwrite**: Auto-injection now preserves existing custom rules completely
+- **File Integrity Validation**: Added validation methods to ensure file consistency
+
+### 🌐 Internationalization Improvements
+
+- **English Default Rules**: Converted default rules to English for broader accessibility
+- **Adaptive Language**: Rules now adapt to user input language automatically
+- **Better Documentation**: Enhanced documentation in both English and Indonesian
+
+### 🛠️ Technical Enhancements
+
+- **Enhanced Logging**: Comprehensive debug logging for troubleshooting
+- **TypeScript Improvements**: Fixed TypeScript configuration with DOM library support
+- **Gitignore Management**: Automatic management of `.taskmaster/` and `.github/instructions/` in gitignore
+- **Error Handling**: Improved error handling with graceful degradation
+
+### 📁 New File Structure
+
+```
+project/
+├── .taskmaster/
+│   ├── config/settings.json
+│   ├── docs/prd.txt
+│   ├── tasks/task001.txt...task020.txt
+│   └── status/summary.md
+└── .github/
+    └── instructions/
+        └── copilot.instructions.md
+```
+
+### 🐛 Bug Fixes
+
+- Fixed custom rules not persisting after VS Code restart
+- Fixed auto-injection overwriting user modifications
+- Fixed TypeScript compilation errors
+- Fixed webview persistence issues
+
 ## [1.1.2] - 2024-12-19
 
 ### 🔧 Simplified File Management
