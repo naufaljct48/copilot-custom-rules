@@ -2,6 +2,19 @@
 
 All notable changes to the "Copilot Custom Rules" extension will be documented in this file.
 
+## [1.2.1] - 2025-06-10
+
+### 🧹 Code Cleanup & Optimization
+
+- **Removed Duplicate Files**: Cleaned up duplicate `webviewProvider_new.ts` file
+- **File Structure Optimization**: Maintained only necessary files for cleaner project structure
+- **Version Synchronization**: Ensured package.json version matches extension capabilities
+
+### 🔧 Minor Improvements
+
+- **Code Consistency**: Improved code consistency across all TypeScript files
+- **Build Optimization**: Enhanced build process with cleaner file management
+
 ## [1.2.0] - 2025-06-10
 
 ### 🎯 Task Master System Integration
